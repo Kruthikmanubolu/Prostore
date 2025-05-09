@@ -10,6 +10,7 @@ const HomePage = async () => {
     Category: product.category,
     Brand: product.brand,
     Description: product.description,
+    
   }));
 
   return (
