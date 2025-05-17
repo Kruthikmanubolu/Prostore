@@ -6,7 +6,8 @@ import { compareSync } from 'bcrypt-ts-edge';
 import type { NextAuthConfig } from 'next-auth';
 import { todo } from 'node:test';
 import { object } from 'zod';
-
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 // Define the User type expected by NextAuth
 type User = {
     id: string;
@@ -93,6 +94,31 @@ export const config = {
                 }
             }
             return token
+        },
+
+        authorized({request,auth} : any){
+            //check for session cart cookie
+            if(!request.cookies.get('sessionCartId')){
+                //Generate session card id cookie
+                const sessionCartId = crypto.randomUUID();
+                // Clone the req headers
+                const newRequestHeaders = new Headers(request.headers);
+
+                //Create new res and add the new headers
+
+                const response = NextResponse.next({
+                    request: {
+                        headers: newRequestHeaders
+                    }
+                });
+
+                //Set newly generated sessionCartId in the response cookies
+
+                response.cookies.set('sessionCartId', sessionCartId);
+                return response;
+            } else {
+                return true;
+            }
         }
     }
 } satisfies NextAuthConfig;

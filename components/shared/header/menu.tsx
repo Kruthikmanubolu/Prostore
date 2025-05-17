@@ -13,7 +13,7 @@ import UserButton from "./user-button";
 
 const Menu = () => {
   return (
-    <div className="flex justify-end gap-3">
+    <div className="flex justify-end gap-3" suppressHydrationWarning>
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         <ModeToggle />
         <Button asChild variant={"ghost"}>
