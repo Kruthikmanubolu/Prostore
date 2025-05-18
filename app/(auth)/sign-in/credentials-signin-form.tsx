@@ -32,7 +32,7 @@ const SignInButton = () => {
       <input type='hidden' name='callbackUrl' value={callbackUrl }/>
       <div className="space-y-6">
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="ml-2 mb-2">Email</Label>
           <Input
             id="email"
             name="email"
@@ -44,7 +44,7 @@ const SignInButton = () => {
         </div>
 
         <div>
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" className="ml-2 mb-2">Password</Label>
           <Input
             id="password"
             name="password"

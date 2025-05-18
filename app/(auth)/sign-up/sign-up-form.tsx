@@ -33,7 +33,7 @@ const SignUpButton = () => {
       <div className="space-y-6">
 
         <div>
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name" className="ml-2 mb-2">Name</Label>
           <Input
             id="name"
             name="name"
@@ -44,7 +44,7 @@ const SignUpButton = () => {
           />
         </div>
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="ml-2 mb-2">Email</Label>
           <Input
             id="email"
             name="email"
@@ -56,7 +56,7 @@ const SignUpButton = () => {
         </div>
 
         <div>
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" className="ml-2 mb-2">Password</Label>
           <Input
             id="password"
             name="password"
@@ -68,7 +68,7 @@ const SignUpButton = () => {
         </div>
 
         <div>
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Label htmlFor="confirmPassword" className="ml-2 mb-2">Confirm Password</Label>
           <Input
             id="confirmPassword"
             name="confirmPassword"

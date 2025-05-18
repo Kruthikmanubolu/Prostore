@@ -24,7 +24,7 @@ const SignUpPage = async (props: {
     if (session){
         return redirect(callbackUrl || '/')
     }
-    return (<div className="w-full max-w-md mx-auto">
+    return (<div className="w-[350px] md:w-full lg:w-full max-w-md mx-auto">
         <Card>
             <CardHeader className="space-y-4">
                 <Link href='/' className='flex-center' suppressContentEditableWarning>

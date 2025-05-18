@@ -8,6 +8,14 @@ const config: Config = {
   ],
   theme: {
     extend: {},
+    screens: {
+                x3s: { max: '375px' },
+                xxs: { max: '616px' },
+                xs: { max: '774px' },
+                sm: { max: '874.99px' },
+                md: { min: '875px', max: '1439.98px' },
+                lg: { min: '1439.99px' },
+            },
   },
   plugins: [],
 };
