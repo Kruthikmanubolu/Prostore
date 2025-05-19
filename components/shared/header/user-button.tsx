@@ -27,7 +27,7 @@ const UserButton = async () => {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <div className="flex items-center" suppressHydrationWarning >
-                    <Button variant='ghost' className="relative w-8 h-8 rounded-full ml-2 flex items-center justify-center bg-gray-200">{firstInital}</Button>
+                    <Button variant='ghost' className="relative w-8 h-8 rounded-full ml-2 flex items-center justify-center bg-gray-200 hover:cursor-pointer">{firstInital}</Button>
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -41,7 +41,7 @@ const UserButton = async () => {
                 </DropdownMenuLabel>
                 <DropdownMenuItem className="p-0 mb-1">
                     <form action={signOutUser} className="w-full">
-                        <Button className="w-full py-4 px-2 h-4 justify-start" variant='ghost'>Sign Out</Button>
+                        <Button className="w-full py-4 px-2 h-4 justify-start hover:cursor-pointer" variant='ghost'>Sign Out</Button>
                     </form>
                 </DropdownMenuItem>
             </DropdownMenuContent>
