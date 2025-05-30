@@ -13,6 +13,7 @@ import Image from "next/image";
 import { Car } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import PlaceOrderForm from "./place-order-form";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Place Order",
@@ -79,7 +80,7 @@ const PlaceOrderPage = async () => {
                             {cart.items.map((item) => (
                                 <TableRow key={item.slug}>
                                     <TableCell>
-                                        <Link href={`/product/{item.slug}`} className="flex items-center">
+                                        <Link href={`/product/{item.slug}`} className={cn("md:flex lg:flex items-center")}>
                                         <Image src={item.image} alt={item.name} width={50} height={50}/>
                                         <span className="px-2">{item.name}</span>
                                         </Link>
@@ -87,7 +88,7 @@ const PlaceOrderPage = async () => {
                                     <TableCell>
                                         <span className="px-2">{item.qty}</span>
                                     </TableCell>
-                                    <TableCell className="text-right">$ {item.price}</TableCell>
+                                    <TableCell className="text-left">$ {item.price}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
