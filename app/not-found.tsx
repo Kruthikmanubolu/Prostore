@@ -7,7 +7,7 @@ const notFoundPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen" suppressHydrationWarning>
       <Image
-        src="/images/logo.jpg"
+        src="/images/logo.png"
         width={48}
         height={48}
         alt={`${APP_NAME}`}

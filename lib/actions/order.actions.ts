@@ -199,6 +199,7 @@ export async function approvePayPalOrder(
       success: true,
       message: "Your order has been paid",
     };
+    window.location.reload();
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

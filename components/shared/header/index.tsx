@@ -9,7 +9,7 @@ const Header = () => {
         <div className="flex-start" suppressHydrationWarning>
           <Link href="/" className="flex-start">
             <Image
-              src="/images/logo.jpg"
+              src="/images/logo.png"
               alt={`${APP_NAME} logo`}
               height={48}
               width={48}

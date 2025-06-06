@@ -82,6 +82,7 @@ const PaymentMethodForm = ({
                           >
                             <FormControl>
                               <RadioGroupItem
+                                className="border border-black"
                                 value={paymentMethod}
                                 checked={field.value === paymentMethod}
                               />

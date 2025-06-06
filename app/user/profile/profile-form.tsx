@@ -63,7 +63,7 @@ const ProfileForm = () => {
                   <Input
                     disabled
                     placeholder="Email"
-                    className="input-field"
+                    className="input-field border border-black"
                     {...field}
                   />
                 </FormControl>
@@ -80,7 +80,7 @@ const ProfileForm = () => {
                 <FormControl>
                   <Input
                     placeholder="Name"
-                    className="input-field"
+                    className="input-field border border-black"
                     {...field}
                   />
                 </FormControl>

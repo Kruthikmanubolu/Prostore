@@ -113,7 +113,7 @@ const OrderDetailsTable = ({
               )}
             </CardContent>
           </Card>
-          <Card>
+          <Card className="mb-2">
             <CardContent className="p-4 gap-4">
               <h2 className="text-xl pb-4">Order Items</h2>
               <Table>
