@@ -30,14 +30,21 @@ export default function AdminLayout({
                 <Input
                   type="search"
                   placeholder="Search..."
-                  className="md:w-[100px] lg:w-[300px]"
-                ></Input>
+                  className="hidden md:block md:w-[100px] lg:w-[300px]"
+                />
               </div>
               <Menu />
             </div>
           </div>
         </div>
         <div className="flex-1 space-y-4 p-8 pt-6 container mx-auto wrapper">
+          <div>
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="block md:hidden w-full"
+            />
+          </div>
           {children}
         </div>
         <Toaster richColors position="bottom-right" />
