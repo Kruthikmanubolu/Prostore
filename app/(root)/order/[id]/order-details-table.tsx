@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
 import { Order } from "@/types";
 import Link from "next/link";
@@ -23,16 +24,20 @@ import {
 import {
   createPayPalOrder,
   approvePayPalOrder,
+  updateOrderToPaidCOD,
+  delieveredOrder,
 } from "@/lib/actions/order.actions";
 import { toast } from "sonner";
-
+import { useTransition } from "react";
 
 const OrderDetailsTable = ({
   order,
   paypalClientId,
+  isAdmin,
 }: {
   order: Order;
   paypalClientId: string;
+  isAdmin: boolean;
 }) => {
   const {
     shippingAddress,
@@ -62,21 +67,59 @@ const OrderDetailsTable = ({
   };
 
   const handleCreatePayPalOrder = async () => {
-  const res = await createPayPalOrder(order.id);
+    const res = await createPayPalOrder(order.id);
 
-  toast(res.message, {
-    className: res.success ? "bg-green-500" : "bg-red-500",
-  });
+    toast(res.message, {
+      className: res.success ? "bg-green-500" : "bg-red-500",
+    });
 
-  return res.data?.id; // Make sure your backend returns { id: string }
-};
+    return res.data?.id; // Make sure your backend returns { id: string }
+  };
 
-  const handleApprovePayPalOrder = async (data : {orderID : string;}) => {
+  const handleApprovePayPalOrder = async (data: { orderID: string }) => {
     const res = await approvePayPalOrder(order.id, data);
     toast(res.message, {
-          className: res.success ? "bg-green-500" : "bg-red-500",
-        });
-  }
+      className: res.success ? "bg-green-500" : "bg-red-500",
+    });
+  };
+
+  //Button to mark order as paid
+  const MarkAsPaidButton = () => {
+    const [isPending, startTransition] = useTransition();
+    return (
+      <Button
+        type="button"
+        disabled={isPending}
+        onClick={() =>
+          startTransition(async () => {
+            const res = await updateOrderToPaidCOD(order.id);
+            toast(res.message, {
+              className: res.success ? "bg-green-500" : "bg-red-500",
+            });
+          })
+        }
+      >{isPending ? 'Processing...' : 'Mark as Paid'}</Button>
+    );
+  };
+
+  const MarkAsDelieveredButton = () => {
+    const [isPending, startTransition] = useTransition();
+    return (
+      <Button
+        type="button"
+        disabled={isPending}
+        onClick={() =>
+          startTransition(async () => {
+            const res = await delieveredOrder(order.id);
+            toast(res.message, {
+              className: res.success ? "bg-green-500" : "bg-red-500",
+            });
+          })
+        }
+      >{isPending ? 'Processing...' : 'Mark as Delievered'}</Button>
+    );
+  };
+
   return (
     <>
       <h1 className="py-4 text-2xl">Order {formatId(id)}</h1>
@@ -188,6 +231,12 @@ const OrderDetailsTable = ({
                   </PayPalScriptProvider>
                 </div>
               )}
+              {/* {Cash on Delievery} */}
+              {isAdmin && !isPaid && paymentMethod == "CashOnDelivery" && (
+                <MarkAsPaidButton />
+              )}
+
+              {isAdmin && isPaid && !isDelivered && <MarkAsDelieveredButton />}
             </CardContent>
           </Card>
         </div>
