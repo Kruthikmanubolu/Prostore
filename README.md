@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛒 Shopeezy – E-commerce Web Application
 
-## Getting Started
+Shopeezy is a modern, full-stack e-commerce platform built with **Next.js** and **TypeScript**, offering a smooth shopping experience with secure authentication, product browsing, and cart management. Powered by **Prisma** and **PostgreSQL** (NeonDB), it ensures scalability and performance. The frontend is styled using **Tailwind CSS** and enhanced with elegant UI components from **Shadcn/UI**.
 
-First, run the development server:
+## 🚀 Features
+
+- 🧾 **Product Listing**: Clean UI for browsing items with categories and filters.
+- 🔐 **Authentication**: Secure login/signup via [NextAuth.js](https://next-auth.js.org/) (OAuth, Credentials).
+- 🛒 **Cart System**: Add/remove items, quantity management, and cart persistence.
+- 🧠 **Tech Stack**: Type-safe development with **TypeScript** and Prisma ORM.
+- ☁️ **Database**: PostgreSQL hosted on [NeonDB](https://neon.tech/).
+- 🌐 **Deployment**: Hosted on [Vercel](https://vercel.com/) for instant global availability.
+- 💅 **UI/UX**: Styled with **Tailwind CSS** and **Shadcn UI** for a beautiful and responsive experience.
+
+## 🧱 Tech Stack
+
+| Tech            | Usage                             |
+|-----------------|-----------------------------------|
+| Next.js         | Framework for SSR & API routes    |
+| TypeScript      | Static typing                     |
+| Prisma          | ORM for PostgreSQL                |
+| PostgreSQL      | Database (via NeonDB)             |
+| NextAuth        | Authentication                    |
+| Tailwind CSS    | Utility-first CSS styling         |
+| Shadcn/UI       | Prebuilt UI components            |
+| Vercel          | Deployment platform               |
+
+## 📦 Getting Started
+
+### 1. Clone the Repo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/shopeezy.git
+cd shopeezy
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Dependency Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+# or
+yarn install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Set Up Environment Variables
 
-## Learn More
+#### Create a .env file in the root and fill in the following:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+DATABASE_URL="your_neondb_url"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your_nextauth_secret"
+```
+Replace placeholders with your actual values.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Run Prisma Migrations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
 
-## Deploy on Vercel
+### 5. Start the Dev Server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev         # Start local dev server
+npm run build       # Build for production
+npm run lint        # Run ESLint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 6. Deployment
+
+Shopeezy is deployed on Vercel. Simply connect your GitHub repo and set your environment variables on the Vercel dashboard.
+
+
+
+
+
