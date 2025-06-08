@@ -294,9 +294,9 @@ export async function getMyOrders({
 }
 
 type SalesDataType = {
-  month: string,
-  totalSales: number
-}[]
+  month: string;
+  totalSales: number;
+}[];
 
 //Get sales data and order summary
 export async function getOrderSummary() {
@@ -315,32 +315,69 @@ export async function getOrderSummary() {
   //Get month sales data
 
   const salesDataRaw = await prisma.$queryRaw<
-    Array<{ month: string; totalSales: Decimal}>
+    Array<{ month: string; totalSales: Decimal }>
   >`SELECT to_char("createdAt", 'MM/YY') as "month", sum("totalPrice") as "totalSales" FROM "Order" GROUP BY to_char("createdAt", 'MM/YY') `;
 
-  const salesData:SalesDataType = salesDataRaw.map((enty) => ({
+  const salesData: SalesDataType = salesDataRaw.map((enty) => ({
     month: enty.month,
-    totalSales: Number(enty.totalSales)
-  }) )
+    totalSales: Number(enty.totalSales),
+  }));
 
   //Get the latest sales (orders)
 
   const latestSales = await prisma.order.findMany({
-    orderBy: {createdAt: 'desc'},
+    orderBy: { createdAt: "desc" },
     take: 6,
     include: {
       user: {
-        select: {name: true}
+        select: { name: true },
       },
-    }
-  })
+    },
+  });
 
-  return{
+  return {
     ordersCount,
     productsCount,
     usersCount,
     totalSales,
     latestSales,
-    salesData
+    salesData,
+  };
+}
+
+//Get all orders
+export async function getAllOrders({
+  limit = PAGE_SIZE,
+  page,
+}: {
+  limit?: number;
+  page: number;
+}) {
+  const data = await prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    skip: (page - 1) * limit,
+    include: { user: { select: { name: true } } },
+  });
+
+  const dataCount = await prisma.order.count();
+
+  return {
+    data,
+    totalPages: Math.ceil(dataCount / limit),
+  };
+}
+
+//Delete an order
+export async function deleteOrder(id:string) {
+  try {
+    await prisma.order.delete({
+      where: {id}
+    })
+    revalidatePath('/admin/orders')
+
+    return {success: true, message: 'Order deleted successfully'}
+  } catch (error) {
+    return {success: false, message: formatError(Error) }
   }
 }

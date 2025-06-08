@@ -4,6 +4,7 @@ import Link from "next/link";
 import Menu from "@/components/shared/header/menu";
 import MainNav from "./main-nav";
 import { Input } from "@/components/ui/input";
+import { Toaster } from "sonner";
 
 export default function AdminLayout({
   children,
@@ -39,6 +40,7 @@ export default function AdminLayout({
         <div className="flex-1 space-y-4 p-8 pt-6 container mx-auto wrapper">
           {children}
         </div>
+        <Toaster richColors position="bottom-right" />
       </div>
     </>
   );
