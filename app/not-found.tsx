@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 const notFoundPage = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-full" suppressHydrationWarning>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#f4f4f2] via-[#eae8e1] to-[#dcd9d3] text-neutral-900 dark:bg-gradient-to-b dark:from-[#0f0f0f] dark:via-[#1a1a1a] dark:to-black dark:text-white" suppressHydrationWarning>
       <Image
         src="/images/logo.png"
         width={48}
