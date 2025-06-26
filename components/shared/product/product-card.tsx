@@ -41,7 +41,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                     />
                 </CardHeader>
                 <CardContent className="p-4 grid gap-4">
-                    <div className="text-xs">{product.Brand}</div>
+                    <div className="text-xs">{product.brand}</div>
                     <h2 className="text-sm font-medium">{product.name}</h2>
                     <div className="flex justify-between items-center gap-4">
                         <p>{rating} Stars</p>

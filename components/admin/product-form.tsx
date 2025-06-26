@@ -31,6 +31,7 @@ import { UploadButton } from "@/lib/uploadthing";
 import { Card, CardContent } from "../ui/card";
 import Image from "next/image";
 import { error } from "console";
+import { Checkbox } from "../ui/checkbox";
 
 const ProductForm = ({
   type,
@@ -61,6 +62,7 @@ const ProductForm = ({
         toast(res.message, {
           className: "bg-green-500",
         });
+        window.location.reload();
         router.push("/admin/products");
       }
     } else if (type === "Update") {
@@ -83,6 +85,8 @@ const ProductForm = ({
   };
 
   const images = form.watch("images");
+  const isFeatured = form.watch("isFeatured");
+  const banner = form.watch("banner");
   return (
     <FormProvider {...form}>
       <form
@@ -191,7 +195,7 @@ const ProductForm = ({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Brand</FormLabel>
                 <FormControl>
                   <Input
                     className="border border-black"
@@ -306,7 +310,41 @@ const ProductForm = ({
             )}
           />
         </div>
-        <div className="upload-field">{/*isFeatured*/}</div>
+        <div className="upload-field">{/*isFeatured*/}
+          Featured Product
+          <Card>
+            <CardContent className="space-y-2 mt-2">
+              <FormField control={form.control} name="isFeatured" render={({ field }) => (
+                <FormItem className="flex flex-row space-x-2 items-center">
+                  <FormControl>
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <FormLabel>Is Featured?</FormLabel>
+                </FormItem>
+              )}></FormField>
+              {isFeatured && banner && (
+                <Image src={banner} alt='banner image' className="w-full object-cover object-center rounded-sm" width={1920} height={680} />
+              )}
+              {isFeatured && !banner && (
+                <UploadButton
+                  endpoint="imageUploader"
+                  appearance={{
+                    button:
+                      "bg-black !text-white border border-black rounded px-4 py-2",
+                  }}
+                  onClientUploadComplete={(res: { url: string }[]) => {
+                    form.setValue("banner", res[0].url);
+                  }}
+                  onUploadError={(error: Error) => {
+                    toast(`ERROR! ${error.message}`, {
+                      className: "bg-green-500",
+                    });
+                  }}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </div>
         <div>
           {/*isDescription*/}
           <FormField

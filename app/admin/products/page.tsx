@@ -43,10 +43,11 @@ const AdminProductsPage = async (props: {
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead className="text-right">Price</TableHead>
+            <TableHead >Price</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Stock</TableHead>
             <TableHead>Rating</TableHead>
+            <TableHead>Is Featured</TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -55,12 +56,13 @@ const AdminProductsPage = async (props: {
             <TableRow key={product.id}>
               <TableCell>{formatId(product.id)}</TableCell>
               <TableCell>{product.name}</TableCell>
-              <TableCell className="text-right">
+              <TableCell>
                 {formatCurrency(product.price)}
               </TableCell>
               <TableCell>{product.category}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>{product.rating}</TableCell>
+              <TableCell>{String(product.isFeatured)}</TableCell>
               <TableCell className="flex gap-1">
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/admin/products/${product.id}`}>Edit</Link>
@@ -71,7 +73,7 @@ const AdminProductsPage = async (props: {
           ))}
         </TableBody>
       </Table>
-      {products.totalPages && products.totalPages > 1 && (
+      { products.totalPages > 1 && (
         <Pagination page={page} totalPages={products.totalPages} />
       )}
     </div>
