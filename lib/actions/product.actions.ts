@@ -40,18 +40,62 @@ export async function getAllProducts({
   limit = PAGE_SIZE,
   page,
   category,
+  price,
+  rating,
+  sort,
 }: {
   query: string;
   limit?: number;
   page: number;
   category?: string;
+  price?: string;
+  rating?: string;
+  sort?: string;
 }) {
+  const where = {
+    ...(query &&
+      query !== "all" && {
+        name: {
+          contains: query,
+          mode: "insensitive" as const,
+        },
+      }),
+    ...(category &&
+      category !== "all" && {
+        category,
+      }),
+    ...(price &&
+      price !== "all" && {
+        price: {
+          gte: Number(price.split("-")[0]),
+          lte: Number(price.split("-")[1]),
+        },
+      }),
+    ...(rating &&
+      rating !== "all" && {
+        rating: {
+          gte: Number(rating),
+        },
+      }),
+  };
+
+  const orderBy =
+    sort === "lowest"
+      ? { price: "asc" as const }
+      : sort === "highest"
+      ? { price: "desc" as const }
+      : sort === "rating"
+      ? { rating: "desc" as const }
+      : { createdAt: "desc" as const };
+
   const data = await prisma.product.findMany({
+    where,
+    orderBy,
     skip: (page - 1) * limit,
     take: limit,
   });
 
-  const dataCount = await prisma.product.count();
+  const dataCount = await prisma.product.count({ where });
 
   return {
     data,

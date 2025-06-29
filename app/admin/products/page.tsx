@@ -33,7 +33,19 @@ const AdminProductsPage = async (props: {
   return (
     <div className="space-y-2">
       <div className="flex flex-between">
-        <h1 className="h2-bold">Products</h1>
+        <div className="items-center gap-3">
+          <h1 className="h2-bold">Products</h1>
+          {searchText && (
+            <div>
+              Filtered By <i>&quot; {searchText}&quot;</i>{" "}
+              <Link href="/admin/products">
+                <Button variant="outline" size="sm">
+                  Remove Filter
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
         <Button asChild variant="default">
           <Link href="/admin/products/create">Create Product</Link>
         </Button>
@@ -43,7 +55,7 @@ const AdminProductsPage = async (props: {
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead >Price</TableHead>
+            <TableHead>Price</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Stock</TableHead>
             <TableHead>Rating</TableHead>
@@ -56,9 +68,7 @@ const AdminProductsPage = async (props: {
             <TableRow key={product.id}>
               <TableCell>{formatId(product.id)}</TableCell>
               <TableCell>{product.name}</TableCell>
-              <TableCell>
-                {formatCurrency(product.price)}
-              </TableCell>
+              <TableCell>{formatCurrency(product.price)}</TableCell>
               <TableCell>{product.category}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>{product.rating}</TableCell>
@@ -73,7 +83,7 @@ const AdminProductsPage = async (props: {
           ))}
         </TableBody>
       </Table>
-      { products.totalPages > 1 && (
+      {products.totalPages > 1 && (
         <Pagination page={page} totalPages={products.totalPages} />
       )}
     </div>
