@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { v4 as uuidv4 } from "uuid";
 
 import { CartItem } from "@/types";
 import { convertToPlainObj, formatError, round2 } from "../utils";
@@ -8,10 +9,32 @@ import { auth } from "@/auth";
 import { prisma } from "@/db/prisma";
 import { cartItemSchema, insertCartSchema } from "../validators";
 import { revalidatePath } from "next/cache";
-import { Prisma } from "@prisma/client";
 
-//Calculate cart prices
+// ✅ READ-ONLY function for SSR or anywhere
+export async function getSessionCartId() {
+  const cookieStore = await cookies();
+  return cookieStore.get("sessionCartId")?.value ?? null;
+}
 
+// ✅ Can only be used inside Server Actions or Route Handlers (cookie setter allowed)
+async function getOrCreateSessionCartIdSafe() {
+  const cookieStore = await cookies();
+  let sessionCartId = cookieStore.get("sessionCartId")?.value;
+
+  if (!sessionCartId) {
+    const newId = uuidv4();
+    cookieStore.set("sessionCartId", newId, {
+      httpOnly: true,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
+    return newId;
+  }
+
+  return sessionCartId;
+}
+
+// Calculate cart prices
 const calcPrice = (items: CartItem[]) => {
   const itemsPrice = round2(
       items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0)
@@ -28,28 +51,17 @@ const calcPrice = (items: CartItem[]) => {
   };
 };
 
+// ✅ Server Action: Add item to cart
 export async function addItemToCart(data: CartItem) {
   try {
-    // Check for the cart cookie
-    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
-
-    if (!sessionCartId) throw new Error("Cart Session not found");
-
-    // Get Session get user Id
+    const sessionCartId = await getOrCreateSessionCartIdSafe();
 
     const session = await auth();
-
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
-    //Get Cart
-
-    const cart = await getMyCart();
-
-    //Parse and validate item
+    const cart = await getMyCart(sessionCartId, userId);
 
     const item = cartItemSchema.parse(data);
-
-    //Find product in db
 
     const product = await prisma.product.findFirst({
       where: { id: item.productId },
@@ -58,55 +70,41 @@ export async function addItemToCart(data: CartItem) {
 
     if (!cart) {
       const newCart = insertCartSchema.parse({
-        userId: userId,
+        userId,
         items: [item],
-        sessionCartId: sessionCartId,
+        sessionCartId,
         ...calcPrice([item]),
       });
 
       await prisma.cart.create({
         data: newCart,
       });
-      //Revalidate
 
       revalidatePath(`/product/${product.slug}`);
-      return {
-        success: true,
-        message: `${product.name} added to cart`,
-      };
+      return { success: true, message: `${product.name} added to cart` };
     } else {
-      //check if item is already in the cart
       const existItem = (cart.items as CartItem[]).find(
         (x) => x.productId === item.productId
       );
 
       if (existItem) {
-        //Check stock
-
         if (product.stock < existItem.qty + 1) {
           throw new Error("Not enough stock");
         }
 
-        //Increase the qty
         (cart.items as CartItem[]).find(
           (x) => x.productId === item.productId
         )!.qty = existItem.qty + 1;
       } else {
-        //If item no exist
-        //Check stock
         if (product.stock < 1) throw new Error("Not enough stock");
-        //Add item to the cart.items
 
         cart.items.push(item);
       }
 
-      //Save to database
       await prisma.cart.update({
         where: { id: cart.id },
         data: {
-          items: {
-            set: cart.items as any, // or as Prisma.InputJsonValue
-          },
+          items: { set: cart.items as any },
           ...calcPrice(cart.items as CartItem[]),
         },
       });
@@ -114,38 +112,48 @@ export async function addItemToCart(data: CartItem) {
       revalidatePath(`/product/${product.slug}`);
       return {
         success: true,
-        message: `${product.name} ${
-          existItem ? "updated in" : "added to"
-        } cart`,
+        message: `${product.name} ${existItem ? "updated in" : "added to"} cart`,
       };
     }
   } catch (error) {
     return {
-      success: true,
+      success: false,
       message: formatError(error),
     };
   }
 }
 
-export async function getMyCart() {
-  // Check for the cart cookie
-  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+// ✅ Shared Cart Getter (No cookie writes allowed here)
+export async function getMyCart(
+  sessionCartId?: string | null,
+  userId?: string | null
+) {
+  if (!sessionCartId) {
+    sessionCartId = await getSessionCartId();
+  }
 
-  if (!sessionCartId) throw new Error("Cart Session not found");
+  if (!sessionCartId && !userId) return undefined;
 
-  // Get Session get user Id
+  if (!userId) {
+    const session = await auth();
+    userId = session?.user?.id ?? undefined;
+  }
+  
 
-  const session = await auth();
+  const whereClause =
+  userId !== undefined
+    ? { userId }
+    : sessionCartId !== null
+    ? { sessionCartId }
+    : undefined;
 
-  const userId = session?.user?.id ? (session.user.id as string) : undefined;
+if (!whereClause) return undefined; // No filters, cannot query cart.
 
-  // Get userCart from db
   const cart = await prisma.cart.findFirst({
-    where: userId ? { userId: userId } : { sessionCartId: sessionCartId },
+    where: whereClause,
   });
-  if (!cart) return undefined;
 
-  //convert decimals and return
+  if (!cart) return undefined;
 
   return convertToPlainObj({
     ...cart,
@@ -157,53 +165,45 @@ export async function getMyCart() {
   });
 }
 
+// ✅ Server Action: Remove item from cart
 export async function removeItemFromCart(productId: string) {
   try {
-    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
-    if (!sessionCartId) throw new Error("Cart Session not found");
-
-    //get product 
+    const sessionCartId = await getOrCreateSessionCartIdSafe();
 
     const product = await prisma.product.findFirst({
-      where: {id: productId}
+      where: { id: productId },
     });
+    if (!product) throw new Error("Product not found");
 
-    if(!product) throw new Error('Product not found')
+    const cart = await getMyCart(sessionCartId);
+    if (!cart) throw new Error("Cart not found");
 
-    // Get user cart
-    const cart = await getMyCart();
-    if(!cart) throw  new Error('Cart not found')
+    const exist = (cart.items as CartItem[]).find(
+      (x) => x.productId === productId
+    );
+    if (!exist) throw new Error("Item not found");
 
-    //Check item
-    const exist = (cart.items as CartItem[]).find((x) => x.productId === productId);
-    if(!exist) throw new Error('Item not found');
-
-    //Check if only 1 in qty
-    if(exist.qty === 1){
-      //Remove from cart
-      cart.items = (cart.items as CartItem[]).filter((x) => x.productId !== exist.productId)
+    if (exist.qty === 1) {
+      cart.items = (cart.items as CartItem[]).filter(
+        (x) => x.productId !== exist.productId
+      );
     } else {
-      (cart.items as CartItem[]).find((x) => x.productId === productId)!.qty = exist.qty - 1;
+      (cart.items as CartItem[]).find(
+        (x) => x.productId === productId
+      )!.qty = exist.qty - 1;
     }
 
-    //update the cart in db
     await prisma.cart.update({
-      where: {id: cart.id},
+      where: { id: cart.id },
       data: {
-          items: {
-            set: cart.items as any, // or as Prisma.InputJsonValue
-          },
-          ...calcPrice(cart.items as CartItem[]),
-        },
+        items: { set: cart.items as any },
+        ...calcPrice(cart.items as CartItem[]),
+      },
     });
 
-    //revalidate path
-    revalidatePath(`/product/${product.slug}`)
+    revalidatePath(`/product/${product.slug}`);
 
-    return{
-      success: true,
-      message: `${product.name} was removed from cart`
-    }
+    return { success: true, message: `${product.name} was removed from cart` };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

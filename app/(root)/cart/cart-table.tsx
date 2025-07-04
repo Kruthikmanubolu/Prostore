@@ -113,7 +113,8 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                       </Button>
                     </TableCell>
                     <TableCell className="text-right">$ {item.price}</TableCell>
-                    <TableCell className="text-right">$ {item.qty * Number(item.price)}</TableCell>
+                    <TableCell className="text-right">$ {Math.ceil(item.qty * Number(item.price) * 100) / 100
+                    }</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
