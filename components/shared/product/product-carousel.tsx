@@ -8,7 +8,7 @@ import Image from 'next/image'
 
 const ProductCarousel = ({ data }: { data: Product[] }) => {
     return (
-        <Carousel className='w-full' opts={{
+        <Carousel className='w-full hidden md:block' opts={{
             loop: true
         }} plugins={[
             Autoplay({
